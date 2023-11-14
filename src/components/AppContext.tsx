@@ -1,20 +1,27 @@
-import React, { createContext, useEffect, useState, ReactNode } from "react";
+import React, { createContext, useEffect, useState, ReactNode, useMemo } from "react";
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from "react-router-dom"; 
 
-interface AppContextType {
-    test: string;
-    user: any; // Replace any with the actual type for your user data
-    logoutUser: () => void;
-    loginUser: (token: string) => void; // Replace with actual arguments if needed
+interface User {
+    // Define your user type here
 }
 
-const AppContext = createContext<AppContextType>({
-    test: "defaultTest",
-    user: null, // Replace null with a default value if necessary
-    logoutUser: () => { }, // No-op function as default
-    loginUser: (token: string) => { }, // No-op function as default
-});
+interface AppContextType {
+    test: string;
+    // user: any;
+    user: User | null;
+    logoutUser: () => void;
+    loginUser: (token: string) => void;
+}
+
+// const AppContext = createContext<AppContextType>({
+//     test: "defaultTest",
+//     user: null, // Replace null with a default value if necessary
+//     logoutUser: () => { }, // No-op function as default
+//     loginUser: (token: string) => { }, // No-op function as default
+// });
+
+const AppContext = createContext<AppContextType | null>(null);
 
 export default AppContext;
 
@@ -98,12 +105,12 @@ export const Provider = ({ children }: { children: ReactNode }) => {
         alert("Logout Successful");
     };
 
-    let contextData = {
+    const contextData = useMemo(() => ({
         test: "user123",
         user: user,
         logoutUser: logoutUser,
         loginUser: loginUser,
-    };
+    }), [user, loginUser, logoutUser]);
 
     return (
         <AppContext.Provider value={contextData}>{children}</AppContext.Provider>
